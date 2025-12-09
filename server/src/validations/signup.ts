@@ -13,7 +13,9 @@ const signupUserSchema = z
       .optional(),
     email: z
       .email("Invalid email address")
-      .max(100, "Email must not exceed 100 characters"),
+      .max(30, "Email must not exceed 30 characters")
+      .trim()
+      .toLowerCase(),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")

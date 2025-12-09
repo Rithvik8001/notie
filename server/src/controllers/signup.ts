@@ -4,6 +4,7 @@ import { db } from "../db/config";
 import { userTable } from "../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import ErrorHandler from "../utils/errors-util";
 
 export default async function signupController(
   req: Request,
@@ -12,17 +13,11 @@ export default async function signupController(
   const result = await signupValidation(req.body);
 
   if (!result.success) {
-    res.status(400).json({
-      success: false,
-      message: "Data is invalid",
-    });
-    return;
+    throw ErrorHandler.validationError(result.error);
   }
-
   const { email, password, userName } = result.data;
 
   try {
-    // Check if email already exists
     const existingUser = await db
       .select()
       .from(userTable)
@@ -30,17 +25,13 @@ export default async function signupController(
       .limit(1);
 
     if (existingUser.length > 0) {
-      res.status(409).json({
-        success: false,
-        message: "Email already exists",
-      });
-      return;
+      throw ErrorHandler.conflict(
+        "Email already registered. Please use a different email or try logging in."
+      );
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert new user (userName is optional, only include if present)
     const [newUser] = await db
       .insert(userTable)
       .values({
@@ -52,18 +43,21 @@ export default async function signupController(
 
     res.status(201).json({
       success: true,
-      message: "User created successfully",
+      message: "Account created successfully",
       data: {
         id: newUser.id,
         email: newUser.email,
         userName: newUser.userName,
       },
     });
+    return;
   } catch (error) {
+    if (error instanceof ErrorHandler) {
+      throw error;
+    }
     console.error("Signup error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    throw ErrorHandler.internalServerError(
+      "Failed to create account. Please try again later."
+    );
   }
 }
