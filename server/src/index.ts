@@ -21,6 +21,7 @@ app.use(express.json());
 // routes
 app.use("/api/auth", authRoute);
 
+// error handling middleware
 app.use(errorHandlingMiddleware);
 
 const startServer = async (): Promise<void> => {
