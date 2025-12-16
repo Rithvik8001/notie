@@ -7,12 +7,6 @@ import bcrypt from "bcrypt";
 import ErrorHandler from "../utils/errors-util";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is not set");
-}
-
 export default async function loginController(
   req: Request,
   res: Response
@@ -26,6 +20,13 @@ export default async function loginController(
   const { email, password } = result.data;
 
   try {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw ErrorHandler.internalServerError(
+        "Authentication is not configured (JWT_SECRET missing)."
+      );
+    }
+
     const user = await db
       .select()
       .from(userTable)
@@ -45,13 +46,16 @@ export default async function loginController(
       );
     }
 
-    const token = jwt.sign({ userId: user[0].id }, JWT_SECRET!, {
+    const token = jwt.sign({ userId: user[0].id }, jwtSecret, {
       expiresIn: "1d",
     });
 
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      path: "/",
       maxAge: 1000 * 60 * 60 * 24,
     });
 

@@ -4,6 +4,8 @@ import cors from "cors";
 import { connectDB } from "./db/config";
 import authRoute from "./routes/auth/route";
 import { errorHandlingMiddleware } from "./middleware/errorHandler";
+import { authMiddleware } from "./middleware/auth/auth";
+import cookieParser from "cookie-parser";
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -17,6 +19,8 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(authMiddleware);
 
 // routes
 app.use("/api/auth", authRoute);
