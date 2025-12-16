@@ -62,7 +62,7 @@ class ErrorHandler extends Error {
   }
 
   static validationError(zodError: any) {
-    const parsedErrors: ValidationError[] = (zodError?.errors || []).map(
+    const parsedErrors: ValidationError[] = (zodError?.issues || []).map(
       (error: any) => {
         const field = error.path?.join(".") || "unknown";
         const message = error.message || "Invalid input";

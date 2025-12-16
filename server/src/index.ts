@@ -6,6 +6,7 @@ import authRoute from "./routes/auth/route";
 import { errorHandlingMiddleware } from "./middleware/errorHandler";
 import { authMiddleware } from "./middleware/auth/auth";
 import cookieParser from "cookie-parser";
+import notesRoute from "./routes/notes/route";
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -20,10 +21,10 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(authMiddleware);
 
 // routes
 app.use("/api/auth", authRoute);
+app.use("/api/notes", authMiddleware, notesRoute);
 
 // error handling middleware
 app.use(errorHandlingMiddleware);
