@@ -1,4 +1,5 @@
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -10,7 +11,9 @@ export default function Header() {
         Notie is an AI powered note taking app that helps you take notes faster
         and easier.
       </p>
-      <Button variant="default">Get Started</Button>
+      <Link href="/signup">
+        <Button variant="default">Get Started</Button>
+      </Link>
     </div>
   );
 }
