@@ -1,10 +1,10 @@
 import { uuid, text, varchar } from "drizzle-orm/pg-core";
-import { serial, timestamp } from "drizzle-orm/pg-core";
+import { timestamp } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 import { userTable } from "./user";
 
 export const notesTable = pgTable("notes", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 100 }).notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

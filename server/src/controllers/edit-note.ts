@@ -29,14 +29,15 @@ export default async function editNotesController(
       );
     }
 
-    const id = req.params.id;
-    if (!id || typeof id !== "string") {
+    const noteId = req.params.id;
+    if (!noteId || typeof noteId !== "string") {
       throw ErrorHandler.badRequest("Invalid note ID");
     }
 
-    const noteId = Number(id);
-    if (isNaN(noteId)) {
-      throw ErrorHandler.badRequest("Note ID must be a valid number");
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(noteId)) {
+      throw ErrorHandler.badRequest("Note ID must be a valid UUID");
     }
 
     const updateData: { title?: string; content?: string } = {};

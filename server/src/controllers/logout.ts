@@ -7,6 +7,7 @@ export default async function logoutController(
 ): Promise<void> {
   try {
     const isProd = process.env.NODE_ENV === "production";
+
     res.cookie("token", "", {
       httpOnly: true,
       secure: isProd,

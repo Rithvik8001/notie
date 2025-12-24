@@ -21,8 +21,18 @@ const editNoteSchema = z
   })
   .strict();
 
+const deleteNoteSchema = z
+  .object({
+    id: z
+      .string()
+      .uuid("Note ID must be a valid UUID")
+      .min(1, "Note ID is required"),
+  })
+  .strict();
+
 export type CreateNoteData = z.infer<typeof createNoteSchema>;
 export type EditNoteData = z.infer<typeof editNoteSchema>;
+export type DeleteNoteData = z.infer<typeof deleteNoteSchema>;
 
 export const createNoteValidation = async (payload: unknown) => {
   const result = createNoteSchema.safeParse(payload);
@@ -31,5 +41,10 @@ export const createNoteValidation = async (payload: unknown) => {
 
 export const editNoteValidation = async (payload: unknown) => {
   const result = editNoteSchema.safeParse(payload);
+  return result;
+};
+
+export const deleteNoteValidation = async (payload: unknown) => {
+  const result = deleteNoteSchema.safeParse(payload);
   return result;
 };
