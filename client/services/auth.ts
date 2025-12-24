@@ -130,6 +130,42 @@ export const signup = async (
   }
 };
 
+export const getCurrentUser = async () => {
+  try {
+    const response = await fetch(`${getServerUrl()}/api/auth/me`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      await handleApiError(response);
+    }
+
+    const data = (await response.json()) as ApiResponse<{
+      id: string;
+      email: string;
+      userName: string | null;
+      createdAt: Date | string;
+    }>;
+
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof Error && "statusCode" in error) {
+      throw error;
+    }
+    console.error("Get current user error:", error);
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : "Failed to retrieve user. Please try again later."
+    );
+  }
+};
+
 export const logout = async () => {
   try {
     const response = await fetch(`${getServerUrl()}/api/auth/logout`, {

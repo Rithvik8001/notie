@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { login } from "@/services/auth";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Container from "@/components/container";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,8 +31,28 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast.success("Login successful");
+      router.push("/dashboard");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to login");
+      if (err instanceof Error) {
+        const errorWithDetails = err as Error & {
+          errors?: Array<{ field: string; message: string }>;
+        };
+
+        if (errorWithDetails.errors && errorWithDetails.errors.length > 0) {
+          const errorMessages = errorWithDetails.errors
+            .map((error) => error.message)
+            .join(", ");
+          toast.error(errorMessages, {
+            duration: 5000,
+          });
+        } else {
+          toast.error(err.message, {
+            duration: 4000,
+          });
+        }
+      } else {
+        toast.error("Failed to login. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signup } from "@/services/auth";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Container from "@/components/container";
 import { toast } from "sonner";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,8 +32,38 @@ export default function SignupPage() {
     try {
       await signup(email, password, userName.trim() || undefined);
       toast.success("Account created successfully");
+      router.push("/login");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to sign up");
+      if (err instanceof Error) {
+        const errorWithDetails = err as Error & {
+          errors?: Array<{ field: string; message: string }>;
+        };
+
+        if (errorWithDetails.errors && errorWithDetails.errors.length > 0) {
+          if (errorWithDetails.errors.length === 1) {
+            toast.error(errorWithDetails.errors[0].message, {
+              duration: 5000,
+            });
+          } else {
+            const firstError = errorWithDetails.errors[0];
+            const otherErrors = errorWithDetails.errors
+              .slice(1)
+              .map((e) => `• ${e.message}`)
+              .join("\n");
+
+            toast.error(firstError.message, {
+              duration: 6000,
+              description: otherErrors,
+            });
+          }
+        } else {
+          toast.error(err.message, {
+            duration: 4000,
+          });
+        }
+      } else {
+        toast.error("Failed to sign up. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
