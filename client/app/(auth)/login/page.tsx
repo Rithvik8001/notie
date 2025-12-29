@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Container from "@/components/container";
 import { toast } from "sonner";
+import { userStore } from "@/store/store";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { fetchUser } = userStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +32,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      // Fetch user data and store it
+      await fetchUser(true);
       toast.success("Login successful");
       router.push("/dashboard");
     } catch (err) {

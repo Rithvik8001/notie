@@ -2,40 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUser, logout } from "@/services/auth";
-import { DashboardLayout, type User } from "@/components/dashboard";
+import { logout } from "@/services/auth";
+import { DashboardLayout } from "@/components/dashboard";
+import { userStore } from "@/store/store";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user, isLoading, error, fetchUser, clearUser } = userStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setIsLoading(true);
-        const response = await getCurrentUser();
-        if (response.success && response.data) {
-          setUser(response.data);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load user data"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    // Fetch user from store (will use cached if available, otherwise fetch from API)
+    // On page refresh, store is cleared, so it will fetch from API
     fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
       await logout();
+      clearUser();
       router.push("/login");
     } catch (err) {
       console.error("Logout error:", err);
