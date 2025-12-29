@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, User } from "lucide-react";
+import { LayoutDashboard, User, Plus } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -19,6 +19,11 @@ export function DashboardSidebarNav() {
       title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Create",
+      url: "/dashboard/create",
+      icon: Plus,
     },
     {
       title: "Profile",
