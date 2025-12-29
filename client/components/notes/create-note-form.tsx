@@ -5,8 +5,9 @@ import { notesStore } from "@/store/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { NovelEditor } from "@/components/editor/novel-editor";
+import type { JSONContent } from "novel";
 import {
   Sheet,
   SheetContent,
@@ -30,14 +31,14 @@ export function CreateNoteForm() {
   const { createNote } = notesStore();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState<JSONContent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (title.trim() === "" || content.trim() === "") {
+    if (title.trim() === "" || !content) {
       toast.error("Title and content are required");
       return;
     }
@@ -50,10 +51,10 @@ export function CreateNoteForm() {
     setIsLoading(true);
 
     try {
-      await createNote(title.trim(), content.trim());
+      await createNote(title.trim(), JSON.stringify(content));
       toast.success("Note created successfully");
       setTitle("");
-      setContent("");
+      setContent(null);
       setOpen(false);
     } catch (err) {
       if (err instanceof Error) {
@@ -100,16 +101,13 @@ export function CreateNoteForm() {
           </p>
         </div>
 
-        <div className="space-y-2 pb-4 border-b border-gray-100">
+        <div className="space-y-2">
           <Label htmlFor="content">Content</Label>
-          <Textarea
-            id="content"
-            placeholder="Enter note content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={12}
-            disabled={isLoading}
-            className="resize-none"
+          <NovelEditor
+            initialContent={content || undefined}
+            onChange={(json) => setContent(json)}
+            placeholder="Press '/' for formatting commands, or just start writing your note..."
+            editable={!isLoading}
           />
         </div>
       </div>

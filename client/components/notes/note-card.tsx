@@ -6,6 +6,7 @@ import { Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteNoteDialog } from "./delete-note-dialog";
 import { EditNoteForm } from "./edit-note-form";
+import { NovelEditor } from "@/components/editor/novel-editor";
 
 interface NoteCardProps {
   note: Note;
@@ -64,10 +65,13 @@ export function NoteCard({ note, onDelete }: NoteCardProps) {
             </div>
           </div>
         </div>
-        <div className="p-4">
-          <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
-            {note.content}
-          </p>
+        <div className="p-4 max-h-48 overflow-hidden">
+          <div className="line-clamp-3">
+            <NovelEditor
+              initialContent={note.content}
+              editable={false}
+            />
+          </div>
         </div>
         <div className="px-4 py-3 border-t border-gray-100">
           <p className="text-xs text-muted-foreground">
