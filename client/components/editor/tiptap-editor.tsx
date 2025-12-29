@@ -71,7 +71,7 @@ export function TipTapEditor({
     editable,
     editorProps: {
       attributes: {
-        class: `prose prose-sm max-w-none focus:outline-none ${className}`,
+        class: `tiptap-editor focus:outline-none ${className}`,
       },
     },
     onUpdate: ({ editor }) => {
