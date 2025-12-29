@@ -8,9 +8,8 @@ export default function Nav() {
       <div className="w-full flex items-center justify-between p-2 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <Link href="/">
-            <BadgeTurkishLira size={30} />
+            <BadgeTurkishLira size={30} className="text-primary" />
           </Link>
-          <span className="text-2xl tracking-tight cursor-pointer">Notie</span>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/login">

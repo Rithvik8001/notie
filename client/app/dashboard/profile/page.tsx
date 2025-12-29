@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser, logout } from "@/services/auth";
-import { DashboardLayout, type User } from "@/components/dashboard";
+import {
+  DashboardLayout,
+  DashboardProfileContent,
+  type User,
+} from "@/components/dashboard";
 
-export default function DashboardPage() {
+export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,6 +54,7 @@ export default function DashboardPage() {
       error={error}
       isLoggingOut={isLoggingOut}
       onLogout={handleLogout}
+      customContent={user ? <DashboardProfileContent user={user} /> : undefined}
     />
   );
 }
