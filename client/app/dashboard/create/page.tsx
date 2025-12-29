@@ -12,15 +12,14 @@ import { userStore } from "@/store/store";
 import { DashboardLayout } from "@/components/dashboard";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ProtectedRoute } from "@/components/auth";
-import { NovelEditor } from "@/components/editor/novel-editor";
-import type { JSONContent } from "novel";
+import { TipTapEditor } from "@/components/editor/tiptap-editor";
 
 export default function CreateNotePage() {
   const router = useRouter();
   const { user, isLoading, error, clearUser } = userStore();
   const { createNote } = notesStore();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState<JSONContent | null>(null);
+  const [content, setContent] = useState<any>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -117,10 +116,10 @@ export default function CreateNotePage() {
 
             <div className="space-y-2">
               <Label htmlFor="content">Content</Label>
-              <NovelEditor
-                initialContent={content || undefined}
-                onChange={(json) => setContent(json)}
-                placeholder="Press '/' for formatting commands, or just start writing your note..."
+              <TipTapEditor
+                initialContent={content}
+                onChange={(data) => setContent(data.json)}
+                placeholder="Start writing your note..."
                 editable={!isCreating}
               />
             </div>

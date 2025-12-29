@@ -6,7 +6,7 @@ import { Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteNoteDialog } from "./delete-note-dialog";
 import { EditNoteForm } from "./edit-note-form";
-import { NovelEditor } from "@/components/editor/novel-editor";
+import { TipTapEditor } from "@/components/editor/tiptap-editor";
 
 interface NoteCardProps {
   note: Note;
@@ -16,6 +16,11 @@ interface NoteCardProps {
 export function NoteCard({ note, onDelete }: NoteCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+
+  // Parse JSON content if it's a string
+  const parsedContent = typeof note.content === 'string'
+    ? JSON.parse(note.content)
+    : note.content;
 
   const formatDate = (date: Date | string) => {
     const d = new Date(date);
@@ -67,9 +72,10 @@ export function NoteCard({ note, onDelete }: NoteCardProps) {
         </div>
         <div className="p-4 max-h-48 overflow-hidden">
           <div className="line-clamp-3">
-            <NovelEditor
-              initialContent={note.content}
+            <TipTapEditor
+              initialContent={parsedContent}
               editable={false}
+              className="border-0 p-0"
             />
           </div>
         </div>

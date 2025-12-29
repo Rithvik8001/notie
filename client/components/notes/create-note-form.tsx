@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { NovelEditor } from "@/components/editor/novel-editor";
-import type { JSONContent } from "novel";
+import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import {
   Sheet,
   SheetContent,
@@ -31,7 +30,7 @@ export function CreateNoteForm() {
   const { createNote } = notesStore();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState<JSONContent | null>(null);
+  const [content, setContent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
 
@@ -83,8 +82,8 @@ export function CreateNoteForm() {
   };
 
   const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-6 px-6 pb-6">
-      <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
         <div className="space-y-2 pb-4 border-b border-gray-100">
           <Label htmlFor="title">Title</Label>
           <Input
@@ -103,16 +102,18 @@ export function CreateNoteForm() {
 
         <div className="space-y-2">
           <Label htmlFor="content">Content</Label>
-          <NovelEditor
-            initialContent={content || undefined}
-            onChange={(json) => setContent(json)}
-            placeholder="Press '/' for formatting commands, or just start writing your note..."
-            editable={!isLoading}
-          />
+          <div className="relative">
+            <TipTapEditor
+              initialContent={content}
+              onChange={(data) => setContent(data.json)}
+              placeholder="Start writing your note..."
+              editable={!isLoading}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-3 pt-4 border-t border-gray-100">
+      <div className="flex gap-3 px-6 py-4 border-t border-gray-100 bg-background">
         <Button
           type="button"
           variant="outline"
@@ -138,14 +139,14 @@ export function CreateNoteForm() {
             Create Note
           </Button>
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh]">
           <DrawerHeader className="border-b border-gray-100">
             <DrawerTitle>Create New Note</DrawerTitle>
             <DrawerDescription>
               Add a new note to your collection
             </DrawerDescription>
           </DrawerHeader>
-          <div className="pt-6 max-h-[80vh] overflow-y-auto">{formContent}</div>
+          <div className="flex-1 overflow-hidden">{formContent}</div>
         </DrawerContent>
       </Drawer>
     );
@@ -159,12 +160,12 @@ export function CreateNoteForm() {
           Create Note
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:max-w-xl p-0 flex flex-col">
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-gray-100">
           <SheetTitle>Create New Note</SheetTitle>
           <SheetDescription>Add a new note to your collection</SheetDescription>
         </SheetHeader>
-        <div className="pt-6">{formContent}</div>
+        <div className="flex-1 overflow-hidden pt-6">{formContent}</div>
       </SheetContent>
     </Sheet>
   );

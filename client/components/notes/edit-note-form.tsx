@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { NovelEditor } from "@/components/editor/novel-editor";
-import type { JSONContent } from "novel";
+import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import {
   Sheet,
   SheetContent,
@@ -34,7 +33,11 @@ interface EditNoteFormProps {
 export function EditNoteForm({ note, open, onOpenChange }: EditNoteFormProps) {
   const { updateNote } = notesStore();
   const [title, setTitle] = useState(note.title);
-  const [content, setContent] = useState<JSONContent | string>(note.content);
+  // Parse JSON content if it's a string
+  const parsedContent = typeof note.content === 'string'
+    ? JSON.parse(note.content)
+    : note.content;
+  const [content, setContent] = useState<any>(parsedContent);
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
 
@@ -88,8 +91,8 @@ export function EditNoteForm({ note, open, onOpenChange }: EditNoteFormProps) {
   };
 
   const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-6 px-6 pb-6">
-      <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
         <div className="space-y-2 pb-4 border-b border-gray-100">
           <Label htmlFor="edit-title">Title</Label>
           <Input
@@ -108,16 +111,18 @@ export function EditNoteForm({ note, open, onOpenChange }: EditNoteFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="edit-content">Content</Label>
-          <NovelEditor
-            initialContent={content}
-            onChange={(json) => setContent(json)}
-            placeholder="Press '/' for formatting commands, or just start writing your note..."
-            editable={!isLoading}
-          />
+          <div className="relative">
+            <TipTapEditor
+              initialContent={content}
+              onChange={(data) => setContent(data.json)}
+              placeholder="Start writing your note..."
+              editable={!isLoading}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-3 pt-4 border-t border-gray-100">
+      <div className="flex gap-3 px-6 py-4 border-t border-gray-100 bg-background">
         <Button
           type="button"
           variant="outline"
@@ -137,12 +142,12 @@ export function EditNoteForm({ note, open, onOpenChange }: EditNoteFormProps) {
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh]">
           <DrawerHeader className="border-b border-gray-100">
             <DrawerTitle>Edit Note</DrawerTitle>
             <DrawerDescription>Make changes to your note</DrawerDescription>
           </DrawerHeader>
-          <div className="pt-6 max-h-[80vh] overflow-y-auto">{formContent}</div>
+          <div className="flex-1 overflow-hidden">{formContent}</div>
         </DrawerContent>
       </Drawer>
     );
@@ -150,12 +155,12 @@ export function EditNoteForm({ note, open, onOpenChange }: EditNoteFormProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:max-w-xl p-0 flex flex-col">
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-gray-100">
           <SheetTitle>Edit Note</SheetTitle>
           <SheetDescription>Make changes to your note</SheetDescription>
         </SheetHeader>
-        <div className="pt-6">{formContent}</div>
+        <div className="flex-1 overflow-hidden pt-6">{formContent}</div>
       </SheetContent>
     </Sheet>
   );
